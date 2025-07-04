@@ -1,3 +1,5 @@
+# ConnectPLUS
+
 ConnectPLUS is a database management system designed to connect working professionals with users seeking to hire them for a wide range of tasks. This project demonstrates the end-to-end design and implementation of a relational database solution that simulates real-world workflows for service discovery and management.
 
 # Key Features
