@@ -1,0 +1,223 @@
+
+CREATE SCHEMA Connect_Plus;
+SET SEARCH_PATH TO Connect_Plus;
+
+CREATE TABLE Users(
+	User_ID VARCHAR(20),
+	Registration_date DATE,
+	Last_login DATE,
+	
+	PRIMARY KEY(User_ID)
+);
+
+CREATE TABLE Seeker(
+	Seeker_ID VARCHAR(20),
+	Name VARCHAR(50),
+	City VARCHAR(30),
+	State VARCHAR(30),
+	Locality VARCHAR(30),
+	Email VARCHAR(30),
+	Gender CHAR,
+	Age SMALLINT,
+	Contact_No CHAR(10),
+	
+	PRIMARY KEY(Seeker_ID),
+	FOREIGN KEY Seeker_ID REFERENCES Users(User_ID)
+);
+
+
+CREATE TABLE Provider(
+	Provider_ID VARCHAR(20),
+	Name VARCHAR(50),
+	City VARCHAR(30),
+	State VARCHAR(30),
+	Locality VARCHAR(30),
+	Gender CHAR,
+	Age SMALLINT,
+	Rating NUMERIC(2,1),
+	Experience SMALLINT,
+	
+	PRIMARY KEY(Provider_ID),
+	FOREIGN KEY Provider_ID REFERENCES Users(User_ID)
+);
+
+
+CREATE TABLE Provider_Email(
+	Provider_ID VARCHAR(20),
+	Email VARCHAR(50),
+	
+	PRIMARY KEY(Provider_ID, Email),
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Provider_Contact_No(
+	Provider_ID VARCHAR(20),
+	Contact_No CHAR(10),
+	
+	PRIMARY KEY(Provider_ID, Contact_No),
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Hires(
+	Seeker_ID VARCHAR(20),
+	Provider_ID VARCHAR(20),
+	Start_date DATE,
+	End_date DATE,
+	Charges INTEGER,
+	Payment_Status BOOL,
+	Availability BOOL,
+	
+	PRIMARY KEY(Seeker_ID, Provider_ID, Start_date),
+	FOREIGN KEY Seeker_ID REFERENCES Seeker(Seeker_ID),
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Reviews(
+	Seeker_ID VARCHAR(20),
+	Provider_ID VARCHAR(20),
+	Start_date DATE,
+	Review_date DATE,
+	Work_rating NUMERIC(2,1)
+	Comments VARCHAR(300),
+	Report BOOL,
+	
+	PRIMARY KEY(Seeker_ID, Provider_ID, Start_date, Review_date), 
+	FOREIGN KEY Seeker_ID REFERENCES Hires(Seeker_ID),
+	FOREIGN KEY Provider_ID REFERENCES Hires(Provider_ID),
+	FOREIGN KEY Start_date REFERENCES Hires(Start_date)
+);
+
+
+CREATE TABLE Travel(
+	Provider_ID VARCHAR(20),
+	
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Travel_Packages(
+	Provider_ID VARCHAR(20),
+	Description VARCHAR(300),
+	Location VARCHAR(30),
+	Start_date DATE,
+	Price_per_head INTEGER,
+	
+	PRIMARY KEY(Provider_ID, Description, Location, Start_date, Price_per_head),
+	FOREIGN KEY Provider_ID REFERENCES Travel(Provider_ID)
+);
+
+
+CREATE TABLE Beauty(
+	Provider_ID VARCHAR(20),
+	
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Beauty_Services(
+	Provider_ID VARCHAR(20),
+	Description VARCHAR(300),
+	Avg_Charge INTEGER,
+	Service_Name VARCHAR(50),
+	PRIMARY KEY (Provider_ID, Description, Avg_Charge, Service_Name),
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Craftsmen(
+	Provider_ID VARCHAR(20),
+	Expertise VARCHAR(50),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Vendors(
+	Provider_ID VARCHAR(20),
+	Product VARCHAR(50),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Consultants(
+	Provider_ID VARCHAR(20),
+	Field VARCHAR(50),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Repairing(
+	Provider_ID VARCHAR(20),
+	Product_Type VARCHAR(50),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Trainer(
+	Provider_ID VARCHAR(20),
+	Field VARCHAR(30),
+	Achievements VARCHAR(200),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Wedding_Management(
+	Provider_ID VARCHAR(20),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Wedding_Packages(
+	Provider_ID VARCHAR(20),
+	Location VARCHAR(100),
+	Avg_Charge INTEGER,
+	Caterer VARCHAR(50),
+	
+	PRIMARY KEY(Provider_ID, Location, Avg_Charge, Caterer),
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Housekeeping(
+	Provider_ID VARCHAR(20),
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Housekeeping_Work_Type(
+	Provider_ID VARCHAR(20),
+	Work_type VARCHAR(50),
+	
+	PRIMARY KEY(Provider_ID, Work_type),
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+CREATE TABLE Hourly_Worker(
+	Provider_ID VARCHAR(20),
+	Pay_Scale INTEGER,
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+CREATE TABLE Monthly_Worker(
+	Provider_ID VARCHAR(20),
+	Salary INTEGER,
+	PRIMARY KEY Provider_ID,
+	FOREIGN KEY Provider_ID REFERENCES Provider(Provider_ID)
+);
+
+
+
+

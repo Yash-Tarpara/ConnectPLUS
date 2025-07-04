@@ -1,0 +1,143 @@
+User's Queries
+
+
+Q1. List Out the Wedding managers for a wedding in Ahmedabad.
+
+SELECT *
+FROM Wedding_Management
+NATURAL JOIN Provider NATURAL JOIN Provider_Email NATURAL JOIN Provider_Contact_No
+WHERE Provider.City = 'Ahmedabad';
+
+
+Q2. List Out all the Beauty Parlours in Surat charging less than 500 for facial treatment.
+
+SELECT *
+FROM Beauty
+NATURAL JOIN Provider NATURAL JOIN Provider_Email NATURAL JOIN Provider_Contact_No NATURAL JOIN beauty_services
+WHERE Provider.City = 'Surat' AND avg_charge < 500 AND description=’Facial Treatments’;
+
+
+Q3. List Out all the female babysitters having experience of more than 1 year and rating more than 4 stars and charging less than 15000 ₹/month in Bhavnagar.
+
+SELECT *
+FROM Housekeeping
+NATURAL JOIN Provider NATURAL JOIN Provider_Email NATURAL JOIN Provider_Contact_No NATURAL JOIN Monthly_Worker
+WHERE Provider.City = 'Bhavnagar' AND Salary < 15000 AND Rating > 4 AND Experience >= 1 ;
+
+
+Q4. List out all travel packages for Goa under 10000/head after 2024-04-04 to 2024-04-19.
+
+SELECT *
+FROM Travel
+NATURAL JOIN Provider
+NATURAL JOIN Provider_Email
+NATURAL JOIN Provider_Contact_No
+NATURAL JOIN Travel_Packages
+WHERE Location = 'Goa'
+  AND Price_Per_Head < 10000
+  AND Start_Date > '2024-04-04'
+  AND Start_Date < '2024-04-19';
+
+
+Q5. Find me Yoga instructor in Vadodara, charging less than 5000/month, having experience of more than 3 years.
+
+SELECT *
+FROM Trainer
+NATURAL JOIN Provider NATURAL JOIN Provider_Email NATURAL JOIN Provider_Contact_No NATURAL JOIN Monthly_Worker
+WHERE Provider.City = 'Vadodara' AND Salary < 5000 AND Experience >= 3 ;
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+Provider's Queries
+
+
+Q6. List out Number of client requests for housekeeping as per area in Surat.
+
+SELECT Locality, COUNT(*) AS No_of_requests 
+FROM Hires
+NATURAL JOIN housekeeping_work_type NATURAL JOIN Seeker 
+WHERE City = 'Surat' 
+GROUP BY Locality ;
+
+
+Q7. Give me my ranking based on the rating in Gandhinagar.
+
+SELECT COUNT (Provider_ID) FROM Provider WHERE City = 'Gandhinagar' AND 
+Rating >= (SELECT Rating FROM Provider WHERE Provider_ID = 'P000110' );
+
+
+Q8. Provide me the list of pending client requests for this month.
+
+SELECT COUNT(Seeker_ID) 
+FROM Hires 
+WHERE Availability = false 
+  AND Provider_ID = 'P000110' 
+  AND EXTRACT(MONTH FROM DATE '2024-04-24') = EXTRACT(MONTH FROM Start_Date);
+
+
+Q9. Give the list of customers I served during the past 3 months.
+
+SELECT *
+FROM Hires NATURAL JOIN Seeker
+WHERE Availability = true
+AND (EXTRACT(YEAR FROM DATE '2024-04-24') - EXTRACT(YEAR FROM Start_Date)) * 12 + (EXTRACT(MONTH FROM DATE '2024-04-24') - EXTRACT(MONTH FROM Start_Date)) <= 3
+AND Provider_ID = 'P311004';
+							
+
+Q10. List my monthly earnings of the financial year 2022-23.
+
+SELECT EXTRACT(MONTH FROM Start_Date) AS Hire_Month, SUM(Charges) AS Earnings
+FROM Hires
+NATURAL JOIN Provider
+WHERE Provider_ID = 'P647343' AND Availability = true
+GROUP BY EXTRACT(MONTH FROM Start_Date) ORDER BY hire_month;
+
+
+Q11. List all the pending transactions of customers last month.
+
+SELECT * FROM Hires NATURAL JOIN Provider WHERE Availability = true AND 
+Provider_ID = 'P110902' AND Payment_Status = false;
+
+
+
+--------------------------------------------------------------
+
+ADMIN QUERIES
+
+
+Q1. Send warning to all the service providers with rating less than 2 stars corresponding to minimum 50 reviews. 
+
+SELECT *
+FROM Provider
+NATURAL JOIN (
+    SELECT Provider_ID, COUNT(*) AS NUM
+    FROM Provider
+    NATURAL JOIN Reviews
+    GROUP BY Provider_ID
+) AS Review_count
+WHERE NUM > 50 AND RATING < 2;
+
+
+Q2. Give the number of new users in the past month. 
+
+SELECT COUNT(*) 
+FROM Users 
+WHERE DATE_TRUNC('month', Registration_Date) >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month');
+
+
+Q3. List accounts of the service provider who are reported more than 50 Times.
+
+SELECT Provider_ID, count(Report) FROM Provider NATURAL JOIN Reviews where Report = true GROUP BY Provider_ID Having count(report)>50
+
+	 	 	 		
+Q4. Send reminder to all the customers having pending payment for over 7 days. 
+
+SELECT Seeker_ID FROM Hires WHERE Payment_Status = false AND 
+(EXTRACT(DAY FROM DATE '2024-04-24') - EXTRACT(DAY FROM Start_Date) > 7);
+
+
+Q5 .Give the list of all users from Ahmedabad. 
+ 	
+( SELECT provider_id FROM Users NATURAL JOIN Provider WHERE City = 'Ahmedabad' ) 
+UNION
+( SELECT seeker_id FROM Users NATURAL JOIN Seeker WHERE City = 'Ahmedabad' ) 
